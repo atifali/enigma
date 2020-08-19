@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="./assets/main.css">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Enigma</title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="./assets/enigma.js"></script>
+    <script src="./assets/jsencrypt.js"></script>
+  </head>
+  <body>
+    <div class="container">
+
+      <h1 class="text-center text-primary" id="title">Enigma</h1>
+      <h3 class="text-center text-secondary" id="subtitle">Keep Your Secrets Yours!</h3>
+      <h5 class="text-center text-secondary" id="prompt">What is this?</h5>
+      <h6 class="text-center text-secondary" id="description">This is a very basic fully client-side web app for playing with the RSA based asymmetric 
+        public key cryptography system. Use it to create a new RSA public-private key pair, or to encrypt any message with an existing 
+        RSA public key or decrypt any message that has been encrypted with a RSA public key whose private key you possess!
+      </h6>
+    
+      <div class="row text-center" id="actions">
+        <div class="col-sm-4">
+          <button type="button" id="nav-btn" class="btn btn-primary" data-target="#carousel" data-slide-to="0">Create Key Pair</button>
+        </div>
+        <div class="col-sm-4">
+          <button type="button" id="nav-btn" class="btn btn-secondary" data-target="#carousel" data-slide-to="1">Encrypt Message</button>
+        </div>
+        <div class="col-sm-4">
+          <button type="button" id="nav-btn" class="btn btn-secondary" data-target="#carousel" data-slide-to="2">Decrypt Message</button>
+        </div>
+      </div>
+    
+      <div id="carousel" class="carousel slide">
+        <div class="carousel-inner">
+    
+          <div class="carousel-item active">
+            <div class="input-group mb-3" id="size-sel">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputSizeSelect">Key Size</label>
+              </div>
+              <select class="custom-select" id="inputSizeSelect">
+                <option selected value="0">Choose your desired key size in bits...</option>
+                <option value="512">512</option>
+                <option value="1024">1024</option>
+                <option value="2048">2048</option>
+                <option value="4096">4096</option>
+              </select>
+              <div class="input-group-append">
+                <label class="input-group-text" for="inputGroupSelect02">bits</label>
+                <button type="button" id="generate-btn" class="btn btn-secondary">Generate!</button>
+              </div>
+            </div>
+            <h6 class="text-center text-secondary" id="key-size-tip">Pro-tip: The bigger the key size the harder it is to break the cipher!</h6>
+            <div id="alert-message"></div>
+    
+            <div class="loading" id="loading"></div>
+    
+            <div class="row text-center" id="copy-keys-action">
+              <div class="col-sm-3">
+                <button type="button" id="copy-btn" value="private" class="btn btn-light" data-toggle="tooltip" title="Copied!">Copy Private Key</button>
+              </div>
+              <div class="col-sm-3">
+                <button type="button" id="copy-btn" value="public" class="btn btn-light" data-toggle="tooltip" title="Copied!">Copy Public Key</button>
+              </div>
+            </div>
+    
+            <div class="input-group" id="private-key">
+              <div class="input-group-prepend">
+                <span class="input-group-text justify-content-center" id="private-key-tag">Private Key</span>
+              </div>
+              <textarea disabled class="form-control" aria-label="Private Key" id="private-key-text"></textarea>
+            </div>
+            <div class="input-group" id="public-key">
+              <div class="input-group-prepend">
+                <span class="input-group-text justify-content-center" id="public-key-tag">Public Key</span>
+              </div>
+              <textarea disabled class="form-control" aria-label="Public Key" id="public-key-text"></textarea>
+            </div>
+          </div>
+    
+          <div class="carousel-item">
+            <div class="input-group" id="public-key-encrypt">
+              <div class="input-group-prepend">
+                <span class="input-group-text justify-content-center" id="public-key-encrypt-tag">Public Key</span>
+              </div>
+              <textarea placeholder="Enter RSA Public Key here..." class="form-control" aria-label="Public Key Encrypt" id="public-key-encrypt-text"></textarea>
+            </div>
+            <div class="input-group" id="message-encrypt">
+              <div class="input-group-prepend">
+                <span class="input-group-text justify-content-center" id="message-encrypt-tag">Plain Message</span>
+              </div>
+              <textarea placeholder="Enter Message to be Encrypted here..." class="form-control" aria-label="Message Encrypt" id="message-encrypt-text"></textarea>
+            </div>
+    
+            <div class="row text-center" id="encrypt-action">
+              <div class="col-sm">
+                <button type="button" id="encrypt-btn" class="btn btn-secondary">Encrypt!</button>
+              </div>
+            </div>
+    
+            <div id="alert-message-encrypt"></div>
+    
+            <div class="loading" id="loading-encrypt"></div>
+    
+            <div class="row text-center" id="copy-encrypted-action">
+              <div class="col-sm">
+                <button type="button" id="copy-btn" value="encrypted" class="btn btn-light" data-toggle="tooltip" title="Copied!">Copy Encrypted Text</button>
+              </div>
+            </div>
+    
+            <div class="input-group" id="encrypted-result">
+              <div class="input-group-prepend">
+                <span class="input-group-text justify-content-center" id="encrypted-message-tag">Encrypted Message</span>
+              </div>
+              <textarea disabled class="form-control" aria-label="Encrypted Message" id="encrypted-message-text"></textarea>
+            </div>
+          </div>
+    
+          <div class="carousel-item">
+            <div class="input-group" id="private-key-decrypt">
+              <div class="input-group-prepend">
+                <span class="input-group-text justify-content-center" id="private-key-decrypt-tag">Private Key</span>
+              </div>
+              <textarea placeholder="Enter RSA Private Key here..." class="form-control" aria-label="Private Key Decrypt" id="private-key-decrypt-text"></textarea>
+            </div>
+            <div class="input-group" id="message-decrypt">
+              <div class="input-group-prepend">
+                <span class="input-group-text justify-content-center" id="message-decrypt-tag">Encrypted Message</span>
+              </div>
+              <textarea placeholder="Enter Message to be Decrypted here..." class="form-control" aria-label="Message Decrypt" id="message-decrypt-text"></textarea>
+            </div>
+    
+            <div class="row text-center" id="decrypt-action">
+              <div class="col-sm">
+                <button type="button" id="decrypt-btn" class="btn btn-secondary">Decrypt!</button>
+              </div>
+            </div>
+    
+            <div id="alert-message-decrypt"></div>
+    
+            <div class="loading" id="loading-decrypt"></div>
+    
+            <div class="row text-center" id="copy-decrypted-action">
+              <div class="col-sm">
+                <button type="button" id="copy-btn" value="decrypted" class="btn btn-light" data-toggle="tooltip" title="Copied!">Copy Decrypted Text</button>
+              </div>
+            </div>
+    
+            <div class="input-group" id="decrypted-result">
+              <div class="input-group-prepend">
+                <span class="input-group-text justify-content-center" id="decrypted-message-tag">Decrypted Message</span>
+              </div>
+              <textarea disabled class="form-control" aria-label="Decrypted Message" id="decrypted-message-text"></textarea>
+            </div>
+          </div>
+    
+        </div>
+      </div>
+    
+    </div>
+  </body>
+</html>
